@@ -1,0 +1,45 @@
+/* Blog Footer 1.0.0 — Copyright Will Myers. All rights reserved. */
+[data-wm-plugin="blog-footer"] {width:100%;scroll-margin-top:var(--wm-bf-scroll-offset,90px);}
+.sqs-edit-mode-active [data-wm-plugin="blog-footer"] {display:none;}
+/*Fix Classic block spacing in Fluid Engine*/
+[data-wm-plugin="blog-footer"] .sqs-layout .sqs-block{
+  width: 100%;
+  box-sizing: border-box;
+}
+[data-wm-plugin="blog-footer"] .fe-block > .sqs-block {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+[data-wm-plugin="blog-footer"] .sqs-layout .fe-block > .sqs-block {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+
+/*Remove padding-top from first section*/
+[data-wm-plugin="blog-footer"] > section.page-section{
+  padding-top: 0 !important;
+}
+
+/*Force Images*/
+[data-wm-plugin="blog-footer"] .sqs-block-calendar img[data-parent-ratio],
+[data-wm-plugin="blog-footer"] .sqs-block-gallery img[data-parent-ratio],
+[data-wm-plugin="blog-footer"] .sqs-block-summary-v2 .summary-block-wrapper:not(.sqs-gallery-design-autocolumns) img[data-parent-ratio] {
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  position: absolute !important;
+  object-position: var(--wm-focal-point, center) !important;
+}
+[data-wm-plugin="blog-footer"] .sqs-block-gallery .content-fit img[data-parent-ratio]{
+  object-position: unset !important;
+}
+
+[data-wm-plugin="blog-footer"] .sqs-block-gallery .image-slide-anchor{
+  position: relative;
+}
+[data-wm-plugin="blog-footer"] .sqs-block-gallery .content-fit img[data-parent-ratio]{
+  object-fit: contain !important;
+}
