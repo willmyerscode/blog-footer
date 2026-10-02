@@ -16,7 +16,7 @@ test('URL wins; paths are exact with an optional trailing slash',()=>{
  assert.equal(resolveSettings(config,{...context,pathname:'/blog/post-more'}).source,'/default');
 });
 test('missing and invalid optional rules keep defaults',()=>{
- assert.deepEqual(resolveSettings(null,context),{source:'',disabled:false,matched:[]});
+ assert.deepEqual(resolveSettings(null,context),{source:'',disabled:false,layout:'sections',target:'',placement:'',matched:[]});
  const result=resolveSettings({defaults:{source:'/default'},categories:[],tags:{Drink:{source:3,disabled:'true'}},urls:null},context);
  assert.equal(result.source,'/default');assert.equal(result.disabled,false);
 });
@@ -28,4 +28,13 @@ test('only same-site sources are accepted; current page cannot load itself',()=>
  for(const source of ['',null,'https://other.com/footer','//other.com/footer','javascript:alert(1)','https://user:pass@example.com/footer','/blog/post/']) assert.equal(sourceURL(source,current),null);
  assert.equal(sourceURL('/footer#section',current),'https://example.com/footer');
  assert.equal(sourceURL('https://example.com/footer',current),'https://example.com/footer');
+});
+
+test('layout and selectors cascade independently and blank selectors restore layout defaults',()=>{
+ const result=resolveSettings({defaults:{source:'/footer',layout:'inline',target:'#intro',placement:'.custom'},categories:{Recipe:{target:'.content-wrapper'}},tags:{Drink:{layout:'sections'}},urls:{'/blog/post':{target:'',placement:''}}},context);
+ assert.equal(result.layout,'sections');assert.equal(result.target,'');assert.equal(result.placement,'');assert.equal(result.source,'/footer');
+});
+test('invalid layout and selector types do not replace inherited settings',()=>{
+ const result=resolveSettings({defaults:{layout:'inline',target:' #intro ',placement:' .custom '},tags:{Drink:{layout:'unknown',target:[],placement:4}}},context);
+ assert.equal(result.layout,'inline');assert.equal(result.target,'#intro');assert.equal(result.placement,'.custom');
 });

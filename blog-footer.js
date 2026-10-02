@@ -1,19 +1,23 @@
-/* Blog Footer 1.0.0 — Copyright Will Myers. All rights reserved. */
+/* Blog Footer 1.1.0-preview — Copyright Will Myers. All rights reserved. */
 (function (root) {
   'use strict';
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0-preview';
   const TOOLKIT = 'https://cdn.jsdelivr.net/gh/willmyerscode/toolkit@v1.0.32/index.js';
   const isObject = value => value !== null && typeof value === 'object' && !Array.isArray(value);
   const pathKey = value => value.replace(/\/+$/, '') || '/';
 
   function resolveSettings(config, context) {
-    const settings = {source: '', disabled: false};
+    const settings = {source: '', disabled: false, layout: 'sections', target: '', placement: ''};
     const matched = [];
     if (!isObject(config)) return {...settings, matched};
     const apply = (rule, label) => {
       if (!isObject(rule)) return;
       if (typeof rule.source === 'string') settings.source = rule.source.trim();
       if (typeof rule.disabled === 'boolean') settings.disabled = rule.disabled;
+      if (['sections', 'inline'].includes(rule.layout)) settings.layout = rule.layout;
+      for (const name of ['target', 'placement']) {
+        if (typeof rule[name] === 'string') settings[name] = rule[name].trim();
+      }
       matched.push(label);
     };
     apply(config.defaults, 'defaults');
@@ -179,23 +183,41 @@
       const region = page.querySelector('main #sections, main #page-regions, main#sections, #page > #sections, #sections, #page-regions');
       const sections = region ? [...region.querySelectorAll('section.page-section')] : [];
       if (!sections.length || page.querySelector('.blog-item-wrapper')) throw new Error('Choose an enabled layout page with at least one section');
+      // Resolve defaults after the cascade so changing layout also changes its defaults.
+      const content = settings.target
+        ? [page.querySelector(settings.target)].filter(Boolean)
+        : settings.layout === 'inline'
+          ? [sections[0].querySelector('.content-wrapper')].filter(Boolean)
+          : sections;
+      if (!content.length) throw new Error('The source target did not match any content');
+      if (content.some(el => el.matches('script, style, link, meta, html, head, body')))
+        throw new Error('Choose a content element as the source target');
+      const placement = settings.placement
+        ? doc.querySelector(settings.placement)
+        : settings.layout === 'inline'
+          ? current.post.querySelector('.blog-item-content-wrapper > .blog-item-content')
+          : (current.post.closest('section') || current.post);
+      if (!placement?.parentElement || placement.matches('html, head, body'))
+        throw new Error('The placement did not match a valid element');
       const runtime = await toolkit();
       if (!active(current)) return;
       const host = doc.createElement('div');
       host.dataset.wmPlugin = 'blog-footer';
       host.dataset.wmBlogFooterHost = '';
       host.dataset.source = settings.source;
+      host.dataset.layout = settings.layout;
       host.dataset.state = 'loading';
       host.id = 'wm-blog-footer';
       current.host = host;
-      for (const section of sections) {
+      for (const section of content) {
         section.removeAttribute('data-page-sections');
         section.querySelectorAll('[data-page-sections]').forEach(el => el.removeAttribute('data-page-sections'));
         // Code blocks remain visible, but fetched scripts are never executed here.
         section.querySelectorAll('script').forEach(el => el.remove());
         host.append(section);
       }
-      (current.post.closest('section') || current.post).after(host);
+      if (!placement.isConnected) throw new Error('The placement is no longer on the page');
+      placement.after(host);
       emit(host, 'beforeInit', {settings, matched: settings.matched});
       // Serialize our native initialization across rapid settings/navigation changes.
       lifecycle = lifecycle.catch(() => {}).then(async () => {

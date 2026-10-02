@@ -1,4 +1,4 @@
-/* Blog Footer 1.0.0 — Copyright Will Myers. All rights reserved. */
+/* Blog Footer 1.1.0-preview — Copyright Will Myers. All rights reserved. */
 [data-wm-plugin="blog-footer"] {width:100%;scroll-margin-top:var(--wm-bf-scroll-offset,90px);}
 .sqs-edit-mode-active [data-wm-plugin="blog-footer"] {display:none;}
 /*Fix Classic block spacing in Fluid Engine*/
@@ -42,4 +42,17 @@
 }
 [data-wm-plugin="blog-footer"] .sqs-block-gallery .content-fit img[data-parent-ratio]{
   object-fit: contain !important;
+}
+
+/* Inline content uses the article column, without the source section's outer spacing. */
+[data-wm-plugin="blog-footer"][data-layout="inline"] {
+  min-width: 0;
+  box-sizing: border-box;
+}
+[data-wm-plugin="blog-footer"][data-layout="inline"] > .content-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box;
 }

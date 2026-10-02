@@ -1,6 +1,6 @@
 {
   "name": "@willmyers/blog-footer",
-  "version": "1.0.0",
+  "version": "1.1.0-preview",
   "private": true,
   "description": "Shared editable footers for Squarespace blog posts",
   "scripts": {"check": "node --check blog-footer.js", "test": "node --test test/*.test.cjs"},
